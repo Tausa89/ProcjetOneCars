@@ -47,4 +47,15 @@ public class Car {
     public boolean doesContainComponent(String component){
         return this.components.contains(component);
     }
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "model='" + model + '\'' +
+                ", price=" + price +
+                ", color=" + color +
+                ", mileage=" + mileage +
+                ", components=" + components +
+                '}';
+    }
 }

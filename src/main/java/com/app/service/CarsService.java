@@ -1,11 +1,16 @@
 package com.app.service;
 
 import com.app.domain.car.Car;
+import com.app.domain.car.CarStatistic;
 import com.app.domain.car.CarUtils;
+import com.app.domain.car.Statistic;
 import com.app.domain.car.type.SortingType;
 
 import com.app.domain.car.type.Color;
+import com.app.domain.car.type.StatisticAttribute;
 import com.app.service.exception.CarsServiceException;
+import org.eclipse.collections.impl.collector.BigIntegerSummaryStatistics;
+import org.eclipse.collections.impl.collector.Collectors2;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -96,6 +101,56 @@ public class CarsService {
     }
 
 
+
+
+    public CarStatistic getStatisticForGivenAttribute(StatisticAttribute statisticAttribute){
+
+        if (Objects.isNull(statisticAttribute)){
+
+            throw new CarsServiceException("Attribute can't be null");
+        }
+
+        return switch (statisticAttribute){
+
+            case PRICE -> getPriceStatistic();
+            case MILEAGE -> getMileageStatistic();
+
+        };
+    }
+
+    private CarStatistic getMileageStatistic() {
+
+        var mileageStatistic = cars.stream().collect(Collectors.summarizingDouble(CarUtils.toMileage::apply));
+
+        return CarStatistic
+                .builder()
+                .mileage(Statistic
+                        .<Double>
+                        builder()
+                        .min(mileageStatistic.getMin())
+                        .max(mileageStatistic.getMax())
+                        .average(mileageStatistic.getAverage())
+                        .build())
+                .build();
+    }
+
+    private CarStatistic getPriceStatistic() {
+
+        var priceStatistic = cars.stream().collect(Collectors2.summarizingBigDecimal(CarUtils.toPrice::apply));
+
+        return CarStatistic
+                .builder()
+                .price(Statistic
+                        .<BigDecimal>builder()
+                        .min(priceStatistic.getMin())
+                        .max(priceStatistic.getMax())
+                        .average(priceStatistic.getAverage())
+                        .build())
+                .build();
+
+    }
+
+
 //    public String getStatisticPriceAndMileage() {
 //
 //        long count = cars.size();
@@ -138,14 +193,7 @@ public class CarsService {
                 .collect(Collectors.toList());
     }
 
-    //TODO pewnie da się inaczej
-//    public  List<Car> sortAlphabeticalComponentList() {
-//
-//        cars.forEach(car -> car.getComponents().sort(String::compareTo));
-//
-//        return cars;
-//
-//    }
+
 
     public List<Car> getCarsWithGivenPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
 

@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,67 +27,33 @@ class CarsServiceTest {
 
     //TODO wstrzykiwanie z pliku
 
-    /*@BeforeAll
-    public static void setUp() {
 
-        Car carOne = Car
-                .builder()
-                .model("Audi")
-                .price(BigDecimal.valueOf(25000))
-                .color(Color.WHITE)
-                .mileage(500)
-                .components(List.of("Windows","ABS","XYZ"))
-                .build();
-        Car carTwo = Car
-                .builder()
-                .model("BMW")
-                .price(BigDecimal.valueOf(5555500))
-                .color(Color.BLACK)
-                .mileage(0)
-                .components(List.of("Mirrors","ABS","GPS"))
-                .build();
+    @Test
+    @DisplayName("when select cars with higher mileage than given")
+    void testOne() {
 
-        Car carThree = Car
+        double mileage = 10000;
+
+
+        var sorted = carsService.findAllWithMileageGreaterThan(mileage);
+
+        var expectedCar = Car
                 .builder()
                 .model("Audi")
                 .price(BigDecimal.valueOf(100000))
                 .color(Color.BLACK)
                 .mileage(25000)
                 .build();
-        List<Car> allCars = List.of(carOne, carTwo, carThree);
-        carsService = new CarsService(allCars);
-
-
-
-//        Car carOne = new Car("Audi", new BigDecimal(25000), Color.WHITE, 500);
-//        Car carThree = new Car("Audi", new BigDecimal(100000), Color.BLACK, 25000);
-//        Car carTwo = new Car("BMW", new BigDecimal(5555500), Color.BLACK, 0);
-//        List<Car> allCars = List.of(carOne, carTwo, carThree);
-//        carsService = new CarsService(allCars);
-//        carTwo.addComponentToCar("Mirrors");
-//        carTwo.addComponentToCar("GPS");
-//        carTwo.addComponentToCar("ABS");
-//        carOne.addComponentToCar("Windows");
-//        carOne.addComponentToCar("ABS");
-//        carOne.addComponentToCar("XYZ");
-
-    }*/
-
-
-    @Test
-    @DisplayName("when cars are sorted correctly by given mileage")
-    void testOne() {
-
-        double mileage = 10000;
-
-        var sorted = carsService.findAllWithMileageGreaterThan(mileage);
 
         assertThat(sorted).hasSize(1);
-        assertThat(sorted.get(0).mileage).isEqualTo(25000);
+        assertThat(sorted.get(0)).usingRecursiveComparison().isEqualTo(expectedCar);
+
+
 
     }
 
 
+    @Test
     @DisplayName("when group cars correctly by their colors")
     void testTwo(){
 
@@ -124,28 +92,42 @@ class CarsServiceTest {
     @DisplayName("when correctly select the most expensive car")
     void testFive(){
 
-        /*var expectedCar = Car.builder()
-                .model()
-                .price()
-                .mileage()
-                .components()
+        var expectedCar = Car
+                .builder()
+                .model("BMW")
+                .price(BigDecimal.valueOf(5555500))
+                .color(Color.BLACK)
+                .mileage(0)
+                .components(List.of("Mirrors","ABS","GPS"))
                 .build();
 
         var car = carsService.getTheMostExpensiveCar();
 
-        assertThat(car).isEqualTo(expectedCar);*/
+
+        assertThat(car).usingRecursiveComparison().isEqualTo(expectedCar);
     }
 
 
-    @Test
+    static List<String> componentsList(){
+        return List.of("ABS","Windows","XYZ");
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("componentsList")
     @DisplayName("when components are sorted alphabetical")
-    void testSix(){
+    void testSix(String componentsList){
+
+
+        System.out.println(componentsList);
+        System.out.println("****");
 
 
         var sorted = carsService.sortAlphabeticalComponentList();
         sorted.forEach(p -> System.out.println(p.components));
 
-        assertThat(sorted.get(0).components.get(0)).isEqualTo("ABS");
+        assertThat(sorted.get(0).components.get(0)).isEqualTo(componentsList);
+        assertThat(sorted.get(0).components.get(1)).isEqualTo(componentsList);
         assertThat(sorted.get(2).components).isEmpty();
         assertThat(sorted.get(1).components.get(1)).isEqualTo("GPS");
     }
