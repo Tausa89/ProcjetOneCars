@@ -3,7 +3,9 @@ package com.app.domain.car;
 import com.app.domain.car.extensions.CarsJsonFileExtension;
 import com.app.domain.car.type.Color;
 import com.app.domain.car.type.SortingType;
+import com.app.domain.car.type.StatisticAttribute;
 import com.app.service.CarsService;
+import com.app.service.exception.CarsServiceException;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -77,16 +79,19 @@ class CarsServiceTest {
     }
 
 
-//    @Test
-//    @DisplayName("when statistic are correct")
-//    void testFour(){
-//
-//        var statistic = carsService.getStatisticPriceAndMileage();
-//
-//        assertThat(statistic).isNotBlank();
-//        assertThat(statistic).isNotNull();
-//
-//    }
+    @Test
+    @DisplayName("when mileage statistic are correct")
+    void testFour(){
+
+
+        var statistic = carsService.getStatisticForGivenAttribute(StatisticAttribute.MILEAGE);
+
+        assertThat(statistic.getMileage().getMin()).isEqualTo(0);
+        assertThat(statistic.getMileage().getMax()).isEqualTo(25000);
+        assertThat(statistic).isNotNull();
+
+
+    }
 
     @Test
     @DisplayName("when correctly select the most expensive car")
@@ -108,26 +113,18 @@ class CarsServiceTest {
     }
 
 
-    static List<String> componentsList(){
-        return List.of("ABS","Windows","XYZ");
-    }
 
 
-    @ParameterizedTest
-    @MethodSource("componentsList")
+
+    @Test
     @DisplayName("when components are sorted alphabetical")
-    void testSix(String componentsList){
-
-
-        System.out.println(componentsList);
-        System.out.println("****");
+    void testSix(){
 
 
         var sorted = carsService.sortAlphabeticalComponentList();
         sorted.forEach(p -> System.out.println(p.components));
 
-        assertThat(sorted.get(0).components.get(0)).isEqualTo(componentsList);
-        assertThat(sorted.get(0).components.get(1)).isEqualTo(componentsList);
+        assertThat(sorted.get(0).components.get(0)).isEqualTo("ABS");
         assertThat(sorted.get(2).components).isEmpty();
         assertThat(sorted.get(1).components.get(1)).isEqualTo("GPS");
     }
@@ -151,11 +148,12 @@ class CarsServiceTest {
     void testEight(){
 
 
-        assertThrows(IllegalStateException.class, () -> {
+        var exception = assertThrows(CarsServiceException.class, () -> {
             var minPrice = BigDecimal.valueOf(10000);
             var maxPrice = BigDecimal.valueOf(1000);
-            var sorted = carsService.getCarsWithGivenPriceRange(minPrice,maxPrice);
+            carsService.getCarsWithGivenPriceRange(minPrice,maxPrice);
         });
+        assertEquals("Minimal price can't be lowe than maximal price",exception.getMessage());
 
 
     }
@@ -165,15 +163,15 @@ class CarsServiceTest {
     @DisplayName("when price or max price is null")
     void testNine(){
 
-        assertThrows(IllegalStateException.class, () -> {
+        assertThrows(CarsServiceException.class, () -> {
 
             var maxPrice = BigDecimal.valueOf(1000);
-            var sorted = carsService.getCarsWithGivenPriceRange(null,maxPrice);
+            carsService.getCarsWithGivenPriceRange(null,maxPrice);
         });
 
-        assertThrows(IllegalStateException.class, () -> {
+        assertThrows(CarsServiceException.class, () -> {
             var minPrice = BigDecimal.valueOf(10000);
-            var sorted = carsService.getCarsWithGivenPriceRange(minPrice,null);
+            carsService.getCarsWithGivenPriceRange(minPrice,null);
         });
 
     }
@@ -187,6 +185,14 @@ class CarsServiceTest {
         assertThat(sorted).hasSize(5);
         assertThat(sorted.get("ABS").size()).isEqualTo(2);
         assertThat(sorted.get("XYZ").size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("When statistic attribute is null")
+    void testEleven(){
+
+        assertThrows(CarsServiceException.class, () -> carsService.getStatisticForGivenAttribute(null));
+
     }
 
 

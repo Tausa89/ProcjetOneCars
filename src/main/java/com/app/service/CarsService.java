@@ -151,28 +151,6 @@ public class CarsService {
     }
 
 
-//    public String getStatisticPriceAndMileage() {
-//
-//        long count = cars.size();
-//
-//        BigDecimal sum = cars.stream().map(Car::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
-//
-//        BigDecimal maxPrice = cars.stream().max(Comparator.comparing(Car::getPrice)).orElseThrow(() -> new IllegalStateException("Error")).getPrice();
-//
-//        BigDecimal minPrice = cars.stream().min(Comparator.comparing(Car::getPrice)).orElseThrow(() -> new IllegalStateException("Error")).getPrice();
-//
-//        BigDecimal averagePrice = sum.divide(new BigDecimal(count), 2, RoundingMode.DOWN);
-//
-//        DoubleSummaryStatistics mileageStats = cars.stream().collect(Collectors.summarizingDouble(Car::getMileage));
-//
-//        return "Highest price is " + maxPrice + ".\n"
-//                + "Lowest price is " + minPrice + ".\n"
-//                + "Average price for all cars is " + averagePrice + ".\n"
-//                + "Highest mileage is " + mileageStats.getMax() + ".\n"
-//                + "Lowest mileage is " + mileageStats.getMin() + ".\n"
-//                + "Average mileage for all cars is " + mileageStats.getAverage() + ".";
-//
-//    }
 
     public Car getTheMostExpensiveCar() {
 
@@ -182,7 +160,7 @@ public class CarsService {
                 .entrySet()
                 .stream()
                 .max(Map.Entry.comparingByKey())
-                .orElseThrow(() -> new IllegalStateException("..."))
+                .orElseThrow(() -> new CarsServiceException("Can't find the most expensive car"))
                 .getValue().get(0);
     }
 
@@ -198,21 +176,17 @@ public class CarsService {
     public List<Car> getCarsWithGivenPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
 
         if (Objects.isNull(minPrice)) {
-            throw new IllegalStateException("....");
+            throw new CarsServiceException("Price can't be null");
         }
 
         if (Objects.isNull(maxPrice)) {
-            throw new IllegalStateException("...");
+            throw new CarsServiceException("Price can't be null");
         }
 
         if (minPrice.compareTo(maxPrice) > 0) {
-            throw new IllegalStateException("...");
+            throw new CarsServiceException("Minimal price can't be lowe than maximal price");
         }
 
-//        return cars.stream()
-//                .filter(car -> car.getPrice().compareTo(minPrice) > 0 && car.getPrice().compareTo(maxPrice) < 0)
-//                .sorted(Comparator.comparing(CarUtils.toModel))
-//                .collect(Collectors.toList());
 
         return cars.stream()
                 .filter(car -> car.hasPriceGreaterThan(minPrice)  && !car.hasPriceGreaterThan(maxPrice))
