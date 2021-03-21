@@ -36,10 +36,11 @@ public class CarsService {
 
 
     /**
-     *
-     * @param sortingType
-     * @param descending
-     * @return
+     * Method provide ability to sort collection of Cars by chosen sortingType give as
+     * parameter and possibility to chose descending or ascending sorting.
+     * @param sortingType Enum decide according to what collection should be sorted
+     * @param descending boolean decide about ascending or descending order or collection
+     * @return sorted List by given parameters.
      */
     public List<Car> sortingByGivenOrder(SortingType sortingType, boolean descending) {
 
@@ -64,14 +65,16 @@ public class CarsService {
     }
 
     /**
-     *
-     * @param mileage
-     * @return
+     * Method provide ability to select from given collection of Cars all cars with
+     * higher mileage than give as parameter
+     * @param mileage double value above which cars would be selected
+     * @return List of cars with higher mileage than given as parameter or CarServiceException
+     * when mileage parameter is negative value.
      */
     public List<Car> findAllWithMileageGreaterThan(double mileage) {
 
         if (mileage <= 0){
-            throw new IllegalStateException("Mileage must have positive value");
+            throw new CarsServiceException("Mileage must have positive value");
         }
 
         return cars.stream()
@@ -80,8 +83,9 @@ public class CarsService {
     }
 
     /**
-     *
-     * @return
+     *Method provide ability to grouped collection of Cars by their colors and count how many of them is for
+     * every color.
+     * @return collection grouped by Cars colors with amount of cars for every color.
      */
     public Map<Color, Long> returnAmountOfCarsForAllColors() {
         return cars.stream()
@@ -93,6 +97,11 @@ public class CarsService {
     }
 
 
+    /**
+     * Method provide ability to select the mose expensive car for every car model.
+     * @return collection of cars where for every model have selected the mose expensive car or CarServiceException
+     * if there is no possibility of finding the most expensive car.
+     */
     public Map<String, Car> returnMostExpensiveCarForEveryModel() {
         return cars.stream()
                 .collect(Collectors.groupingBy(CarUtils.toModel, Collectors.collectingAndThen(
@@ -101,8 +110,12 @@ public class CarsService {
     }
 
 
-
-
+    /**
+     * Method provide base statistic like minimal, maximal or average value for whole collection taking as a argument
+     * parameter for which on statistic should be counted.
+     * @param statisticAttribute Enum decide which statistic should be counted.
+     * @return cars statistics for given as parameter required attribute.
+     */
     public CarStatistic getStatisticForGivenAttribute(StatisticAttribute statisticAttribute){
 
         if (Objects.isNull(statisticAttribute)){
@@ -151,7 +164,10 @@ public class CarsService {
     }
 
 
-
+    /**
+     * Method select the most expensive car from whole collection
+     * @return the most expensive car in collection of cars or CarsServiceException if there is any.
+     */
     public Car getTheMostExpensiveCar() {
 
         return cars
@@ -164,6 +180,10 @@ public class CarsService {
                 .getValue().get(0);
     }
 
+    /**
+     * method sort alphabetically list of components for every car.
+     * @return sorted alphabetically component list.
+     */
     public  List<Car> sortAlphabeticalComponentList() {
         return cars
                 .stream()
@@ -172,7 +192,14 @@ public class CarsService {
     }
 
 
-
+    /**
+     * Method select from whole collection cars in given price range.
+     * @param minPrice BigDecimal the lowest price range for searching.
+     * @param maxPrice BigDecimal the highest price range for searching
+     * @return collection of cars with price higher than minimal price given as parameter and lower price than
+     * maximal price given as parameter. Null if any of price is not filled or CarServiceException when minPrice is
+     * higher than maxPrice
+     */
     public List<Car> getCarsWithGivenPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
 
         if (Objects.isNull(minPrice)) {
@@ -195,6 +222,11 @@ public class CarsService {
 
     }
 
+    /**
+     * Method grouped cars by components their have.
+     * @return collections of cars for every component specified car have.
+     */
+
     public Map<String, List<Car>> groupByComponent() {
         return cars
                 .stream()
@@ -209,19 +241,7 @@ public class CarsService {
                 ));
     }
 
-//    public Map<String, List<Car>> groupByComponent() {
-//        return cars
-//                .stream()
-//                .flatMap(car -> car.getComponents().stream())
-//                .distinct()
-//                .collect(Collectors.toMap(
-//                        component -> component,
-//                        component -> cars
-//                                .stream()
-//                                .filter(car -> car.doseComponentsContain(component))
-//                                .collect(Collectors.toList())
-//                ));
-//    }
+
 
 
 
