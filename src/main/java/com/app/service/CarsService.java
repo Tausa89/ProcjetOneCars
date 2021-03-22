@@ -9,7 +9,6 @@ import com.app.domain.car.type.SortingType;
 import com.app.domain.car.type.Color;
 import com.app.domain.car.type.StatisticAttribute;
 import com.app.service.exception.CarsServiceException;
-import org.eclipse.collections.impl.collector.BigIntegerSummaryStatistics;
 import org.eclipse.collections.impl.collector.Collectors2;
 
 import java.math.BigDecimal;
@@ -26,13 +25,6 @@ public class CarsService {
     }
 
 
-
-    @Override
-    public String toString() {
-        return "Cars{" +
-                "cars=" + cars +
-                '}';
-    }
 
 
     /**
