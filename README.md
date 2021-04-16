@@ -5,7 +5,7 @@
 * [General info](#general-info)
 * [Technologies](#technologies)
 * [Features](#features)
-* [Status](#status)
+
 
 
 ## General info
